@@ -40,6 +40,20 @@ export const router = createBrowserRouter([
     element: <AuthCallback />,
   },
   {
+    path: '/dashboard',
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+    ],
+  },
+  {
     path: '/',
     element: (
       <ProtectedRoute>
