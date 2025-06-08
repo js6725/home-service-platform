@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     session,
     loading,
     logout,
+    setUser, // Add setUser to the context value
     isAuthenticated: !!user,
   };
 
