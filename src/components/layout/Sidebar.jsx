@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { X, Home, FileText, Users, Settings, MessageSquare } from 'lucide-react';
+import { X, Home, FileText, Users, Settings, MessageSquare, Zap, BarChart3, Smartphone, Widget } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ open, onClose }) {
@@ -9,6 +9,10 @@ export default function Sidebar({ open, onClose }) {
     { name: 'Dashboard', to: '/', icon: Home },
     { name: 'Landing Pages', to: '/landing-pages', icon: FileText },
     { name: 'Leads', to: '/leads', icon: MessageSquare },
+    { name: 'Widgets', to: '/widgets', icon: Widget },
+    { name: 'Automation', to: '/automation', icon: Zap },
+    { name: 'Analytics', to: '/analytics', icon: BarChart3 },
+    { name: 'Mobile & PWA', to: '/mobile', icon: Smartphone },
     { name: 'Customers', to: '/customers', icon: Users },
     { name: 'Settings', to: '/settings', icon: Settings },
   ];

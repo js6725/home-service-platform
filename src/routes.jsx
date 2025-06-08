@@ -8,8 +8,13 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import LandingPages from './pages/LandingPages';
 import LandingPageEditor from './pages/LandingPageEditor';
+import AdvancedLandingPageEditor from './pages/AdvancedLandingPageEditor';
 import Leads from './pages/Leads';
 import LeadDetail from './pages/LeadDetail';
+import LeadCaptureWidget from './pages/LeadCaptureWidget';
+import AutomationWorkflows from './pages/AutomationWorkflows';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import PWAFeatures from './pages/PWAFeatures';
 import Customers from './pages/Customers';
 import CustomerDetail from './pages/CustomerDetail';
 import Settings from './pages/Settings';
@@ -50,8 +55,28 @@ export const router = createBrowserRouter([
         element: <LandingPageEditor />,
       },
       {
+        path: 'landing-pages/:id/advanced',
+        element: <AdvancedLandingPageEditor />,
+      },
+      {
         path: 'landing-pages/:id',
         element: <LandingPageEditor />,
+      },
+      {
+        path: 'widgets',
+        element: <LeadCaptureWidget />,
+      },
+      {
+        path: 'automation',
+        element: <AutomationWorkflows />,
+      },
+      {
+        path: 'analytics',
+        element: <AnalyticsDashboard />,
+      },
+      {
+        path: 'mobile',
+        element: <PWAFeatures />,
       },
       {
         path: 'leads',
