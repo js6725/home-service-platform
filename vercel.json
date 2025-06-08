@@ -4,6 +4,44 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "routes": [
+    {
+      "src": "/dashboard",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/leads",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/landing-pages",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/analytics",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/automation",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/widgets",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/mobile",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/customers",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/settings",
+      "dest": "/index.html"
+    }
   ]
 }
 

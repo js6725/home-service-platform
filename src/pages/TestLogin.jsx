@@ -32,9 +32,9 @@ export default function TestLogin() {
       user: testUser
     }));
 
-    // Redirect to dashboard after a short delay
+    // Redirect to root path (which will show dashboard) after a short delay
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/');
     }, 1000);
   }, [navigate, setUser]);
 
