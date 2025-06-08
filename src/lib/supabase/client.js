@@ -17,10 +17,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Auth helper functions
 export const signInWithEmail = async (email) => {
+  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: `${siteUrl}/auth/callback`,
     },
   });
   return { data, error };
