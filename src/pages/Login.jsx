@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Mail, Phone, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Phone, ArrowRight, Loader2, TestTube } from 'lucide-react';
 import { signInWithEmail, signInWithPhone } from '../lib/supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -11,14 +11,53 @@ export default function Login() {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [showTestLogin, setShowTestLogin] = useState(false);
   
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setUser } = useAuth();
   const { addToast } = useToast();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
+
+  const handleTestLogin = () => {
+    // Create a test user session
+    const testUser = {
+      id: '8a36a1be-5e3a-43c4-aebc-cb6dc6a408a6',
+      email: 'jsite6725@gmail.com',
+      user_metadata: {
+        email: 'jsite6725@gmail.com',
+        email_verified: true,
+      },
+      app_metadata: {
+        provider: 'email',
+        providers: ['email']
+      }
+    };
+
+    // Set the test user in the auth context
+    setUser(testUser);
+
+    // Store in localStorage to persist the session
+    localStorage.setItem('supabase.auth.token', JSON.stringify({
+      access_token: 'test-token',
+      refresh_token: 'test-refresh',
+      expires_at: Date.now() + 3600000, // 1 hour from now
+      user: testUser
+    }));
+
+    addToast({
+      title: 'Test Login Successful',
+      message: 'You are now logged in with test credentials!',
+      type: 'success',
+    });
+
+    // Force page reload to trigger auth state change
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 500);
+  };
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
@@ -231,6 +270,39 @@ export default function Login() {
             </div>
           </form>
         )}
+
+        {/* TEST LOGIN SECTION */}
+        <div className="border-t border-gray-200 pt-6">
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setShowTestLogin(!showTestLogin)}
+              className="text-sm text-blue-600 hover:text-blue-500 flex items-center justify-center mx-auto"
+            >
+              <TestTube className="h-4 w-4 mr-1" />
+              Developer Testing Mode
+            </button>
+          </div>
+          
+          {showTestLogin && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
+                <TestTube className="h-4 w-4 mr-1" />
+                Instant Platform Access
+              </h4>
+              <p className="text-xs text-yellow-700 mb-3">
+                Skip authentication and access all features immediately. Perfect for testing and demos.
+              </p>
+              <button
+                onClick={handleTestLogin}
+                className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-yellow-700 transition-colors flex items-center justify-center"
+              >
+                <ArrowRight className="h-4 w-4 mr-2" />
+                Enter Platform Now
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="text-center">
           <p className="text-sm text-gray-medium">
