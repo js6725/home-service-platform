@@ -7,93 +7,89 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary colors
-        primary: {
-          DEFAULT: '#2563EB', // Primary Blue
-          dark: '#1E40AF',    // Primary Blue Dark
-          light: '#DBEAFE',   // Primary Blue Light
-        },
-        // Secondary colors
-        secondary: {
-          DEFAULT: '#0D9488', // Secondary Teal
-          light: '#CCFBF1',   // Secondary Teal Light
-        },
-        // Neutral colors
-        gray: {
-          dark: '#1F2937',    // Dark Gray
-          medium: '#6B7280',  // Medium Gray
-          light: '#E5E7EB',   // Light Gray
-          offwhite: '#F9FAFB', // Off White
-        },
-        // Feedback colors
-        success: '#10B981',   // Success
-        warning: '#F59E0B',   // Warning
-        error: '#EF4444',     // Error
-        info: '#3B82F6',      // Info
-        // Industry-specific accent colors
-        industry: {
-          plumbing: '#0EA5E9', // Plumbing Blue
-          hvac: '#F97316',     // HVAC Orange
-          carpentry: '#854D0E', // Carpentry Brown
-        },
+        // Custom CSS Variables Integration
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'bg-card': 'var(--bg-card)',
+        'bg-elevated': 'var(--bg-elevated)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
+        'text-muted': 'var(--text-muted)',
+        'accent': 'var(--accent-primary)',
+        'accent-secondary': 'var(--accent-secondary)',
+        'cool': 'var(--accent-cool)',
+        'border-primary': 'var(--border-primary)',
+        'border-secondary': 'var(--border-secondary)',
+        
+        // Status colors
+        'success': 'var(--accent-success)',
+        'warning': 'var(--accent-warning)',
+        'error': 'var(--accent-error)',
+        'info': 'var(--accent-info)',
+        
+        // Figma-inspired colors for landing page builder
+        'figma-purple': 'var(--figma-purple)',
+        'figma-pink': 'var(--figma-pink)',
+        'figma-orange': 'var(--figma-orange)',
+        'figma-green': 'var(--figma-green)',
+        'figma-blue': 'var(--figma-blue)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['var(--font-primary)', 'Inter', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       fontSize: {
-        'display': '2.25rem',    // 36px
-        'h1': '1.875rem',        // 30px
-        'h2': '1.5rem',          // 24px
-        'h3': '1.25rem',         // 20px
-        'h4': '1.125rem',        // 18px
-        'body': '1rem',          // 16px
-        'small': '0.875rem',     // 14px
-        'xs': '0.75rem',         // 12px
-      },
-      fontWeight: {
-        regular: '400',
-        medium: '500',
-        semibold: '600',
-        bold: '700',
-      },
-      lineHeight: {
-        tight: '1.25',
-        normal: '1.5',
-        relaxed: '1.75',
+        'xs': 'var(--text-xs)',
+        'sm': 'var(--text-sm)',
+        'base': 'var(--text-base)',
+        'lg': 'var(--text-lg)',
+        'xl': 'var(--text-xl)',
+        '2xl': 'var(--text-2xl)',
+        '3xl': 'var(--text-3xl)',
+        '4xl': 'var(--text-4xl)',
       },
       spacing: {
-        '4xs': '0.125rem',  // 2px
-        '3xs': '0.25rem',   // 4px
-        '2xs': '0.5rem',    // 8px
-        'xs': '0.75rem',    // 12px
-        'sm': '1rem',       // 16px
-        'md': '1.5rem',     // 24px
-        'lg': '2rem',       // 32px
-        'xl': '3rem',       // 48px
-        '2xl': '4rem',      // 64px
-        '3xl': '6rem',      // 96px
-        '4xl': '8rem',      // 128px
+        '1': 'var(--space-1)',
+        '2': 'var(--space-2)',
+        '3': 'var(--space-3)',
+        '4': 'var(--space-4)',
+        '5': 'var(--space-5)',
+        '6': 'var(--space-6)',
+        '8': 'var(--space-8)',
+        '10': 'var(--space-10)',
+        '12': 'var(--space-12)',
+        '16': 'var(--space-16)',
+        '20': 'var(--space-20)',
+        '24': 'var(--space-24)',
       },
       borderRadius: {
-        'none': '0px',
-        'sm': '0.25rem',    // 4px
-        'md': '0.5rem',     // 8px
-        'lg': '0.75rem',    // 12px
-        'xl': '1rem',       // 16px
-        'full': '9999px',   // For pills and avatars
+        'sm': 'var(--radius-sm)',
+        'md': 'var(--radius-md)',
+        'lg': 'var(--radius-lg)',
+        'xl': 'var(--radius-xl)',
+        'full': 'var(--radius-full)',
       },
       boxShadow: {
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'sm': 'var(--shadow-sm)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
+        'dark-sm': 'var(--shadow-dark-sm)',
+        'dark-md': 'var(--shadow-dark-md)',
+        'dark-lg': 'var(--shadow-dark-lg)',
+      },
+      transitionDuration: {
+        'fast': 'var(--transition-fast)',
+        'normal': 'var(--transition-normal)',
+        'slow': 'var(--transition-slow)',
       },
       animation: {
         'fade-in': 'fadeIn 200ms ease-in-out',
         'fade-out': 'fadeOut 200ms ease-in-out',
         'slide-in': 'slideIn 300ms ease-out',
         'slide-out': 'slideOut 300ms ease-in',
+        'bounce': 'var(--transition-bounce)',
       },
       keyframes: {
         fadeIn: {
@@ -115,8 +111,6 @@ export default {
       },
     },
   },
-  plugins: [
-    require('tailwindcss-animate'),
-  ],
+  plugins: [],
 }
 
