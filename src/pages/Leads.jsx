@@ -1,463 +1,378 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase/client';
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  MoreVertical,
+  Phone,
+  Mail,
+  Calendar,
+  DollarSign,
+  User,
+  MapPin,
+  Clock,
+  Star,
+  TrendingUp,
+  Eye,
+  Edit,
+  Trash2
+} from 'lucide-react';
 
-export default function Leads() {
-  const { user } = useAuth();
+const Leads = () => {
   const [leads, setLeads] = useState([]);
-  const [filteredLeads, setFilteredLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    serviceType: 'all',
-    dateRange: 'all'
-  });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newLead, setNewLead] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    service_type: 'plumbing',
-    message: '',
-    estimated_value: ''
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterService, setFilterService] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Sample data
   useEffect(() => {
-    if (user) {
-      fetchLeads();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [leads, filters]);
-
-  const fetchLeads = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('leads')
-        .select('*')
-        .eq('business_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching leads:', error);
-        setLeads([]);
-      } else {
-        setLeads(data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching leads:', error);
-      setLeads([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...leads];
-
-    // Filter by status
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(lead => lead.status === filters.status);
-    }
-
-    // Filter by service type
-    if (filters.serviceType !== 'all') {
-      filtered = filtered.filter(lead => lead.service_type === filters.serviceType);
-    }
-
-    // Filter by date range
-    if (filters.dateRange !== 'all') {
-      const now = new Date();
-      const filterDate = new Date();
-      
-      switch (filters.dateRange) {
-        case 'today':
-          filterDate.setHours(0, 0, 0, 0);
-          break;
-        case 'week':
-          filterDate.setDate(now.getDate() - 7);
-          break;
-        case 'month':
-          filterDate.setMonth(now.getMonth() - 1);
-          break;
-        default:
-          break;
-      }
-      
-      if (filters.dateRange !== 'all') {
-        filtered = filtered.filter(lead => new Date(lead.created_at) >= filterDate);
-      }
-    }
-
-    setFilteredLeads(filtered);
-  };
-
-  const handleAddLead = async (e) => {
-    e.preventDefault();
-    try {
-      const leadData = {
-        ...newLead,
-        business_id: user.id,
+    const sampleLeads = [
+      {
+        id: 1,
+        name: 'John Smith',
+        email: 'john.smith@email.com',
+        phone: '(555) 123-4567',
+        service: 'Emergency Plumbing',
         status: 'new',
-        estimated_value: newLead.estimated_value ? parseFloat(newLead.estimated_value) : null
-      };
-
-      const { data, error } = await supabase
-        .from('leads')
-        .insert([leadData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding lead:', error);
-        alert('Error adding lead. Please try again.');
-      } else {
-        setLeads([data, ...leads]);
-        setShowAddModal(false);
-        setNewLead({
-          name: '',
-          email: '',
-          phone: '',
-          service_type: 'plumbing',
-          message: '',
-          estimated_value: ''
-        });
+        value: 450,
+        priority: 'high',
+        source: 'Landing Page',
+        location: 'Downtown',
+        createdAt: '2024-01-15T10:30:00Z',
+        notes: 'Burst pipe in basement, needs immediate attention'
+      },
+      {
+        id: 2,
+        name: 'Sarah Johnson',
+        email: 'sarah.j@email.com',
+        phone: '(555) 234-5678',
+        service: 'AC Repair',
+        status: 'contacted',
+        value: 320,
+        priority: 'medium',
+        source: 'Google Ads',
+        location: 'Suburbs',
+        createdAt: '2024-01-15T09:15:00Z',
+        notes: 'AC not cooling properly, scheduled for tomorrow'
+      },
+      {
+        id: 3,
+        name: 'Mike Wilson',
+        email: 'mike.wilson@email.com',
+        phone: '(555) 345-6789',
+        service: 'Roof Inspection',
+        status: 'quoted',
+        value: 180,
+        priority: 'low',
+        source: 'Referral',
+        location: 'Uptown',
+        createdAt: '2024-01-14T16:45:00Z',
+        notes: 'Annual inspection, flexible timing'
+      },
+      {
+        id: 4,
+        name: 'Lisa Brown',
+        email: 'lisa.brown@email.com',
+        phone: '(555) 456-7890',
+        service: 'Electrical Wiring',
+        status: 'won',
+        value: 890,
+        priority: 'high',
+        source: 'Website',
+        location: 'Downtown',
+        createdAt: '2024-01-14T14:20:00Z',
+        notes: 'Kitchen renovation wiring, project completed'
+      },
+      {
+        id: 5,
+        name: 'David Garcia',
+        email: 'david.garcia@email.com',
+        phone: '(555) 567-8901',
+        service: 'HVAC Installation',
+        status: 'lost',
+        value: 1200,
+        priority: 'medium',
+        source: 'Social Media',
+        location: 'Westside',
+        createdAt: '2024-01-13T11:10:00Z',
+        notes: 'Went with competitor, price was too high'
       }
-    } catch (error) {
-      console.error('Error adding lead:', error);
-      alert('Error adding lead. Please try again.');
-    }
+    ];
+
+    setTimeout(() => {
+      setLeads(sampleLeads);
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lead.service.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || lead.status === filterStatus;
+    const matchesService = filterService === 'all' || lead.service.toLowerCase().includes(filterService.toLowerCase());
+    return matchesSearch && matchesStatus && matchesService;
+  });
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      new: { class: 'badge-info', text: 'New' },
+      contacted: { class: 'badge-warning', text: 'Contacted' },
+      quoted: { class: 'badge-primary', text: 'Quoted' },
+      won: { class: 'badge-success', text: 'Won' },
+      lost: { class: 'badge-error', text: 'Lost' }
+    };
+    const config = statusConfig[status] || statusConfig.new;
+    return <span className={`badge ${config.class}`}>{config.text}</span>;
   };
 
-  const updateLeadStatus = async (leadId, newStatus) => {
-    try {
-      const { error } = await supabase
-        .from('leads')
-        .update({ status: newStatus })
-        .eq('id', leadId);
-
-      if (error) {
-        console.error('Error updating lead status:', error);
-        alert('Error updating lead status. Please try again.');
-      } else {
-        setLeads(leads.map(lead => 
-          lead.id === leadId ? { ...lead, status: newStatus } : lead
-        ));
-      }
-    } catch (error) {
-      console.error('Error updating lead status:', error);
-      alert('Error updating lead status. Please try again.');
-    }
-  };
-
-  const formatCurrency = (amount) => {
-    if (!amount) return 'N/A';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+  const getPriorityIcon = (priority) => {
+    const priorityConfig = {
+      high: { color: 'text-error', icon: '🔴' },
+      medium: { color: 'text-warning', icon: '🟡' },
+      low: { color: 'text-success', icon: '🟢' }
+    };
+    const config = priorityConfig[priority] || priorityConfig.medium;
+    return <span className={config.color}>{config.icon}</span>;
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    });
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    return date.toLocaleDateString();
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'new': return 'bg-blue-100 text-blue-800';
-      case 'contacted': return 'bg-yellow-100 text-yellow-800';
-      case 'qualified': return 'bg-purple-100 text-purple-800';
-      case 'converted': return 'bg-green-100 text-green-800';
-      case 'lost': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const totalValue = filteredLeads.reduce((sum, lead) => sum + lead.value, 0);
+  const conversionRate = leads.length > 0 ? (leads.filter(l => l.status === 'won').length / leads.length * 100).toFixed(1) : 0;
 
-  const statusOptions = ['new', 'contacted', 'qualified', 'converted', 'lost'];
-  const serviceTypes = ['plumbing', 'hvac', 'carpentry', 'electrical', 'landscaping'];
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="skeleton h-8 w-48"></div>
+          <div className="skeleton h-10 w-32"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="card">
+              <div className="skeleton h-6 w-24 mb-4"></div>
+              <div className="skeleton h-8 w-20 mb-2"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6 flex justify-between items-center">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-primary mb-2">Leads</h1>
+          <p className="text-secondary">Manage and track your potential customers.</p>
+        </div>
+        <button className="btn-primary hover-lift">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Lead
+        </button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Leads</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Manage and track your potential customers
+              <p className="text-sm text-secondary mb-1">Total Leads</p>
+              <p className="text-2xl font-bold text-primary">{leads.length}</p>
+            </div>
+            <User className="w-8 h-8 text-cool" />
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary mb-1">Pipeline Value</p>
+              <p className="text-2xl font-bold text-primary">${totalValue.toLocaleString()}</p>
+            </div>
+            <DollarSign className="w-8 h-8 text-success" />
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary mb-1">Conversion Rate</p>
+              <p className="text-2xl font-bold text-primary">{conversionRate}%</p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-warning" />
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-secondary mb-1">New Today</p>
+              <p className="text-2xl font-bold text-primary">
+                {leads.filter(l => {
+                  const today = new Date().toDateString();
+                  const leadDate = new Date(l.createdAt).toDateString();
+                  return today === leadDate;
+                }).length}
               </p>
             </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Lead
-            </button>
+            <Star className="w-8 h-8 text-info" />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters */}
-        <div className="bg-white shadow rounded-lg mb-6">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select
-                  value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="all">All Statuses</option>
-                  {statusOptions.map(status => (
-                    <option key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
-                <select
-                  value={filters.serviceType}
-                  onChange={(e) => setFilters({ ...filters, serviceType: e.target.value })}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="all">All Services</option>
-                  {serviceTypes.map(service => (
-                    <option key={service} value={service}>
-                      {service.charAt(0).toUpperCase() + service.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                <select
-                  value={filters.dateRange}
-                  onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="all">All Time</option>
-                  <option value="today">Today</option>
-                  <option value="week">Last 7 Days</option>
-                  <option value="month">Last 30 Days</option>
-                </select>
-              </div>
-            </div>
+      {/* Filters */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+            <input
+              type="text"
+              placeholder="Search leads..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-input pl-10 w-64"
+            />
           </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="form-input w-auto"
+          >
+            <option value="all">All Status</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="quoted">Quoted</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+          <select
+            value={filterService}
+            onChange={(e) => setFilterService(e.target.value)}
+            className="form-input w-auto"
+          >
+            <option value="all">All Services</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="electrical">Electrical</option>
+            <option value="hvac">HVAC</option>
+            <option value="roofing">Roofing</option>
+          </select>
         </div>
+        <button className="btn-ghost">
+          <Filter className="w-4 h-4 mr-2" />
+          More Filters
+        </button>
+      </div>
 
-        {/* Leads List */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            {filteredLeads.length > 0 ? (
-              <div className="space-y-4">
-                {filteredLeads.map((lead) => (
-                  <div key={lead.id} className="border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-medium text-gray-900">{lead.name}</h3>
-                          <select
-                            value={lead.status}
-                            onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${getStatusColor(lead.status)}`}
-                          >
-                            {statusOptions.map(status => (
-                              <option key={status} value={status}>
-                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                          <div>
-                            <span className="font-medium">Email:</span> {lead.email}
+      {/* Leads Table */}
+      <div className="card p-0">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="border-b border-primary">
+              <tr>
+                <th className="text-left p-4 font-semibold text-primary">Lead</th>
+                <th className="text-left p-4 font-semibold text-primary">Service</th>
+                <th className="text-left p-4 font-semibold text-primary">Status</th>
+                <th className="text-left p-4 font-semibold text-primary">Value</th>
+                <th className="text-left p-4 font-semibold text-primary">Source</th>
+                <th className="text-left p-4 font-semibold text-primary">Created</th>
+                <th className="text-right p-4 font-semibold text-primary">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredLeads.map((lead) => (
+                <tr key={lead.id} className="border-b border-primary hover:bg-elevated transition-colors">
+                  <td className="p-4">
+                    <div className="flex items-center space-x-3">
+                      {getPriorityIcon(lead.priority)}
+                      <div>
+                        <h4 className="font-medium text-primary">{lead.name}</h4>
+                        <div className="flex items-center space-x-4 text-sm text-secondary">
+                          <div className="flex items-center">
+                            <Mail className="w-3 h-3 mr-1" />
+                            {lead.email}
                           </div>
-                          <div>
-                            <span className="font-medium">Phone:</span> {lead.phone}
-                          </div>
-                          <div>
-                            <span className="font-medium">Service:</span> {lead.service_type}
-                          </div>
-                          <div>
-                            <span className="font-medium">Value:</span> {formatCurrency(lead.estimated_value)}
+                          <div className="flex items-center">
+                            <Phone className="w-3 h-3 mr-1" />
+                            {lead.phone}
                           </div>
                         </div>
-                        
-                        {lead.message && (
-                          <div className="mt-3">
-                            <span className="font-medium text-sm text-gray-700">Message:</span>
-                            <p className="text-sm text-gray-600 mt-1">{lead.message}</p>
-                          </div>
-                        )}
-                        
-                        <div className="mt-3 text-xs text-gray-400">
-                          Created: {formatDate(lead.created_at)}
+                        <div className="flex items-center text-xs text-muted mt-1">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {lead.location}
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No leads found</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {leads.length === 0 
-                    ? "Get started by adding your first lead or creating a landing page to capture leads automatically."
-                    : "Try adjusting your filters to see more leads."
-                  }
-                </p>
-                <div className="mt-6">
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Add Your First Lead
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+                  </td>
+                  <td className="p-4">
+                    <span className="font-medium text-primary">{lead.service}</span>
+                    {lead.notes && (
+                      <p className="text-sm text-secondary mt-1 max-w-xs truncate">
+                        {lead.notes}
+                      </p>
+                    )}
+                  </td>
+                  <td className="p-4">
+                    {getStatusBadge(lead.status)}
+                  </td>
+                  <td className="p-4">
+                    <span className="font-semibold text-primary">${lead.value}</span>
+                  </td>
+                  <td className="p-4">
+                    <span className="text-sm text-secondary">{lead.source}</span>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center text-sm text-secondary">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {formatDate(lead.createdAt)}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end space-x-2">
+                      <button className="btn-icon hover:bg-elevated" title="View">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="btn-icon hover:bg-elevated" title="Edit">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button className="btn-icon hover:bg-elevated" title="More">
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      {/* Add Lead Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add New Lead</h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <form onSubmit={handleAddLead} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newLead.name}
-                    onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                  <input
-                    type="email"
-                    required
-                    value={newLead.email}
-                    onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <input
-                    type="tel"
-                    value={newLead.phone}
-                    onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Service Type</label>
-                  <select
-                    value={newLead.service_type}
-                    onChange={(e) => setNewLead({ ...newLead, service_type: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  >
-                    {serviceTypes.map(service => (
-                      <option key={service} value={service}>
-                        {service.charAt(0).toUpperCase() + service.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Value ($)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={newLead.estimated_value}
-                    onChange={(e) => setNewLead({ ...newLead, estimated_value: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                  <textarea
-                    rows={3}
-                    value={newLead.message}
-                    onChange={(e) => setNewLead({ ...newLead, message: e.target.value })}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-                
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    Add Lead
-                  </button>
-                </div>
-              </form>
-            </div>
+        {filteredLeads.length === 0 && (
+          <div className="text-center py-12">
+            <User className="w-12 h-12 text-muted mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-primary mb-2">No leads found</h3>
+            <p className="text-secondary mb-4">
+              {searchTerm || filterStatus !== 'all' || filterService !== 'all'
+                ? 'Try adjusting your filters'
+                : 'Start by adding your first lead'}
+            </p>
+            <button className="btn-primary">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Lead
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default Leads;
 

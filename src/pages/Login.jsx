@@ -1,28 +1,33 @@
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { Mail, Phone, ArrowRight, Loader2, TestTube } from 'lucide-react';
-import { signInWithEmail, signInWithPhone } from '../lib/supabase/client';
 import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import { Mail, Phone, ArrowRight, Sparkles, Shield, Zap } from 'lucide-react';
 
-export default function Login() {
-  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
+const Login = () => {
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [showTestLogin, setShowTestLogin] = useState(false);
-  
-  const { isAuthenticated, setUser } = useAuth();
-  const { addToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('email');
+  const { signInWithEmail } = useAuth();
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      await signInWithEmail(email);
+      setMessage('Check your email for the magic link!');
+    } catch (error) {
+      setMessage('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleTestLogin = () => {
-    // Create a test user session
+    // Create test user session
     const testUser = {
       id: '8a36a1be-5e3a-43c4-aebc-cb6dc6a408a6',
       email: 'jsite6725@gmail.com',
@@ -36,284 +41,204 @@ export default function Login() {
       }
     };
 
-    // Set the test user in the auth context
-    setUser(testUser);
-
-    // Store in localStorage to persist the session
+    // Store session and redirect
     localStorage.setItem('supabase.auth.token', JSON.stringify({
       access_token: 'test-token',
       refresh_token: 'test-refresh',
-      expires_at: Date.now() + 3600000, // 1 hour from now
+      expires_at: Date.now() + 3600000,
       user: testUser
     }));
 
-    addToast({
-      title: 'Test Login Successful',
-      message: 'You are now logged in with test credentials!',
-      type: 'success',
-    });
-
-    // Force page reload to trigger auth state change
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 500);
+    window.location.href = '/';
   };
 
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setLoading(true);
-    try {
-      const { error } = await signInWithEmail(email);
-      
-      if (error) {
-        addToast({
-          title: 'Authentication Error',
-          message: error.message,
-          type: 'error',
-        });
-      } else {
-        setOtpSent(true);
-        addToast({
-          title: 'Check your email',
-          message: 'We sent you a magic link to sign in.',
-          type: 'success',
-        });
-      }
-    } catch (error) {
-      addToast({
-        title: 'Error',
-        message: 'An unexpected error occurred. Please try again.',
-        type: 'error',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePhoneLogin = async (e) => {
-    e.preventDefault();
-    if (!phone) return;
-
-    setLoading(true);
-    try {
-      const { error } = await signInWithPhone(phone);
-      
-      if (error) {
-        addToast({
-          title: 'Authentication Error',
-          message: error.message,
-          type: 'error',
-        });
-      } else {
-        setOtpSent(true);
-        addToast({
-          title: 'Check your phone',
-          message: 'We sent you a verification code via SMS.',
-          type: 'success',
-        });
-      }
-    } catch (error) {
-      addToast({
-        title: 'Error',
-        message: 'An unexpected error occurred. Please try again.',
-        type: 'error',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (otpSent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-offwhite py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-dark">
-              Check your {loginMethod === 'email' ? 'email' : 'phone'}
-            </h2>
-            <p className="mt-2 text-sm text-gray-medium">
-              {loginMethod === 'email' 
-                ? `We sent a magic link to ${email}. Click the link to sign in.`
-                : `We sent a verification code to ${phone}. Enter the code to sign in.`
-              }
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-accent via-primary-dark to-primary-cool relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
+          <div className="mb-8">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <h1 className="text-5xl font-bold mb-4">
+              ServicePro
+            </h1>
+            <p className="text-xl text-white/90 mb-8">
+              The complete business platform for home service professionals
             </p>
-            <button
-              onClick={() => {
-                setOtpSent(false);
-                setEmail('');
-                setPhone('');
-              }}
-              className="mt-4 text-primary hover:text-primary-dark text-sm"
-            >
-              Try a different {loginMethod === 'email' ? 'email' : 'phone number'}
-            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Zap className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Lightning Fast Setup</h3>
+                <p className="text-white/80">Get your landing pages live in minutes</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Shield className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Enterprise Security</h3>
+                <p className="text-white/80">Bank-level security for your business data</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 p-6 bg-white/10 rounded-xl backdrop-blur-sm">
+            <p className="text-white/90 italic">
+              "ServicePro transformed our lead generation. We've seen a 300% increase in qualified leads since switching."
+            </p>
+            <div className="mt-4 flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full"></div>
+              <div>
+                <p className="font-semibold">Mike Johnson</p>
+                <p className="text-sm text-white/70">Johnson Plumbing Co.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-offwhite py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-dark">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-medium">
-            Welcome back to your Home Service Platform
-          </p>
-        </div>
-
-        {/* Login Method Toggle */}
-        <div className="flex rounded-lg bg-gray-light p-1">
-          <button
-            onClick={() => setLoginMethod('email')}
-            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              loginMethod === 'email'
-                ? 'bg-white text-primary shadow-sm'
-                : 'text-gray-medium hover:text-gray-dark'
-            }`}
-          >
-            <Mail className="h-4 w-4 mr-2" />
-            Email
-          </button>
-          <button
-            onClick={() => setLoginMethod('phone')}
-            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              loginMethod === 'phone'
-                ? 'bg-white text-primary shadow-sm'
-                : 'text-gray-medium hover:text-gray-dark'
-            }`}
-          >
-            <Phone className="h-4 w-4 mr-2" />
-            Phone
-          </button>
-        </div>
-
-        {/* Email Login Form */}
-        {loginMethod === 'email' && (
-          <form className="mt-8 space-y-6" onSubmit={handleEmailLogin}>
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
-                placeholder="Enter your email address"
-                disabled={loading}
-              />
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex flex-col justify-center px-8 lg:px-12">
+        <div className="w-full max-w-md mx-auto">
+          {/* Mobile Logo */}
+          <div className="lg:hidden mb-8 text-center">
+            <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
+            <h1 className="text-2xl font-bold text-primary">ServicePro</h1>
+          </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading || !email}
-                className="btn-primary w-full flex items-center justify-center"
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Mail className="h-4 w-4 mr-2" />
-                )}
-                {loading ? 'Sending magic link...' : 'Send magic link'}
-                {!loading && <ArrowRight className="h-4 w-4 ml-2" />}
-              </button>
-            </div>
-          </form>
-        )}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-primary mb-2">
+              Welcome back
+            </h2>
+            <p className="text-secondary">
+              Sign in to your Home Service Platform
+            </p>
+          </div>
 
-        {/* Phone Login Form */}
-        {loginMethod === 'phone' && (
-          <form className="mt-8 space-y-6" onSubmit={handlePhoneLogin}>
-            <div>
-              <label htmlFor="phone" className="sr-only">
-                Phone number
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="input-field"
-                placeholder="Enter your phone number (e.g., +1234567890)"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading || !phone}
-                className="btn-primary w-full flex items-center justify-center"
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Phone className="h-4 w-4 mr-2" />
-                )}
-                {loading ? 'Sending code...' : 'Send verification code'}
-                {!loading && <ArrowRight className="h-4 w-4 ml-2" />}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* TEST LOGIN SECTION */}
-        <div className="border-t border-gray-200 pt-6">
-          <div className="text-center">
+          {/* Auth Tabs */}
+          <div className="flex mb-6 bg-elevated rounded-lg p-1">
             <button
-              type="button"
-              onClick={() => setShowTestLogin(!showTestLogin)}
-              className="text-sm text-blue-600 hover:text-blue-500 flex items-center justify-center mx-auto"
+              onClick={() => setActiveTab('email')}
+              className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md transition-all ${
+                activeTab === 'email'
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-secondary hover:text-primary'
+              }`}
             >
-              <TestTube className="h-4 w-4 mr-1" />
-              Developer Testing Mode
+              <Mail className="w-4 h-4 mr-2" />
+              Email
+            </button>
+            <button
+              onClick={() => setActiveTab('phone')}
+              className={`flex-1 flex items-center justify-center py-2 px-4 rounded-md transition-all ${
+                activeTab === 'phone'
+                  ? 'bg-card text-primary shadow-sm'
+                  : 'text-secondary hover:text-primary'
+              }`}
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              Phone
             </button>
           </div>
-          
-          {showTestLogin && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-              <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
-                <TestTube className="h-4 w-4 mr-1" />
-                Instant Platform Access
-              </h4>
-              <p className="text-xs text-yellow-700 mb-3">
-                Skip authentication and access all features immediately. Perfect for testing and demos.
-              </p>
-              <button
-                onClick={handleTestLogin}
-                className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-yellow-700 transition-colors flex items-center justify-center"
-              >
-                <ArrowRight className="h-4 w-4 mr-2" />
-                Enter Platform Now
-              </button>
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="form-group">
+              <label className="form-label">
+                {activeTab === 'email' ? 'Email address' : 'Phone number'}
+              </label>
+              <input
+                type={activeTab === 'email' ? 'email' : 'tel'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={
+                  activeTab === 'email' 
+                    ? 'Enter your email address' 
+                    : 'Enter your phone number'
+                }
+                className="form-input"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-full hover-lift"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  Sending magic link...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  Send magic link
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </div>
+              )}
+            </button>
+          </form>
+
+          {/* Message */}
+          {message && (
+            <div className={`mt-4 p-4 rounded-lg ${
+              message.includes('Check your email') 
+                ? 'bg-success/10 text-success border border-success/20' 
+                : 'bg-error/10 text-error border border-error/20'
+            }`}>
+              <p className="text-sm">{message}</p>
             </div>
           )}
-        </div>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-medium">
-            New to our platform?{' '}
-            <Link to="/signup" className="font-medium text-primary hover:text-primary-dark">
-              Create an account
-            </Link>
-          </p>
+          {/* Test Login */}
+          <div className="mt-8 p-4 bg-elevated rounded-lg border border-primary">
+            <h3 className="font-semibold text-primary mb-2">Developer Testing Mode</h3>
+            <p className="text-sm text-secondary mb-4">
+              Skip authentication for testing purposes
+            </p>
+            <button
+              onClick={handleTestLogin}
+              className="btn-secondary w-full"
+            >
+              Enter Platform Now
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-secondary">
+              New to our platform?{' '}
+              <a href="/signup" className="text-cool hover:text-accent font-medium">
+                Create an account
+              </a>
+            </p>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-xs text-muted">
+              By signing in, you agree to our{' '}
+              <a href="#" className="text-cool hover:text-accent">Terms of Service</a>
+              {' '}and{' '}
+              <a href="#" className="text-cool hover:text-accent">Privacy Policy</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
 
