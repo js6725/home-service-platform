@@ -12,6 +12,7 @@ export default defineConfig({
   },
   server: {
     host: true,
+    allowedHosts: ['b022b71d-d632-43fd-b5b6-f2c669869bc1-00-1aiin408ygjbd.worf.replit.dev'],
   },
   test: {
     globals: true,
