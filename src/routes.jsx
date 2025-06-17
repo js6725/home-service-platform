@@ -5,7 +5,6 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 // Pages
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import TestLogin from './pages/TestLogin';
 import Dashboard from './pages/Dashboard';
 import LandingPages from './pages/LandingPages';
 import LandingPageEditor from './pages/LandingPageEditor';
@@ -30,10 +29,6 @@ export const router = createBrowserRouter([
   {
     path: '/signup',
     element: <Signup />,
-  },
-  {
-    path: '/test-login',
-    element: <TestLogin />,
   },
   {
     path: '/auth/callback',

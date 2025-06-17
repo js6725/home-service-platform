@@ -26,32 +26,6 @@ const Login = () => {
     }
   };
 
-  const handleTestLogin = () => {
-    // Create test user session
-    const testUser = {
-      id: '8a36a1be-5e3a-43c4-aebc-cb6dc6a408a6',
-      email: 'jsite6725@gmail.com',
-      user_metadata: {
-        email: 'jsite6725@gmail.com',
-        email_verified: true,
-      },
-      app_metadata: {
-        provider: 'email',
-        providers: ['email']
-      }
-    };
-
-    // Store session and redirect
-    localStorage.setItem('supabase.auth.token', JSON.stringify({
-      access_token: 'test-token',
-      refresh_token: 'test-refresh',
-      expires_at: Date.now() + 3600000,
-      user: testUser
-    }));
-
-    window.location.href = '/';
-  };
-
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
@@ -201,20 +175,6 @@ const Login = () => {
               <p className="text-sm">{message}</p>
             </div>
           )}
-
-          {/* Test Login */}
-          <div className="mt-8 p-4 bg-elevated rounded-lg border border-primary">
-            <h3 className="font-semibold text-primary mb-2">Developer Testing Mode</h3>
-            <p className="text-sm text-secondary mb-4">
-              Skip authentication for testing purposes
-            </p>
-            <button
-              onClick={handleTestLogin}
-              className="btn-secondary w-full"
-            >
-              Enter Platform Now
-            </button>
-          </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
